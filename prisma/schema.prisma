@@ -19,6 +19,7 @@ model User {
   profilePic String
   isAdmin   Boolean @default(false)
   // otp       Otp[]
+  reviewAndRatnig ReviewAndRating[]
   products  Product[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -28,6 +29,7 @@ model Otp {
   id          Int     @id @default(autoincrement())
   otp         String
   userEmail   String
+ 
   // user        User    @relation(fields: [userEmail], references: [email])  / / aisa ek schema bna k chekc kro mappin jiski alg ho
   expireAfter Int     @default(60)
 }
@@ -41,7 +43,24 @@ model Product {
   category String
   userId Int
   user User @relation(fields: [userId], references: [id])
+  reviewAndRating ReviewAndRating[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
  // rating
+}
+
+enum Rating {
+  ONE 
+  TWO
+  }
+model ReviewAndRating {
+  id Int @id @default(autoincrement())
+  review String
+  rating Rating
+  userId Int
+  user User @relation(fields: [userId], references: [id])
+  productId Int
+  product Product @relation(fields: [productId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
