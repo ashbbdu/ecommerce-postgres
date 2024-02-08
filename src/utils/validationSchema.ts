@@ -7,3 +7,8 @@ export const signupSchema = zod.object({
     password : zod.string({required_error : "Password is required !"}),
     otp : zod.number({required_error : "OTP is required !"})
 })
+
+export const loginSchema = zod.object({
+    email : zod.string({required_error : "Email is required !"}),
+    password : zod.string({required_error : "Password is required !"})
+})

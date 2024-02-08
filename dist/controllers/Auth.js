@@ -12,11 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.signup = exports.sendOtp = void 0;
+exports.signin = exports.signup = exports.sendOtp = void 0;
 const client_1 = require("@prisma/client");
+const bcrypt_1 = __importDefault(require("bcrypt"));
 const validationSchema_1 = require("../utils/validationSchema");
 const otp_generator_1 = __importDefault(require("otp-generator"));
 const mailSender_1 = require("../utils/mailSender");
+const jsonwebtoken_1 = __importDefault(require("jsonwebtoken"));
+require("dotenv").config();
 const prisma = new client_1.PrismaClient();
 const sendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
@@ -32,7 +35,8 @@ const sendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 email: email
             }
         });
-        if (existingUser) {
+        console.log(existingUser, "exi");
+        if ((existingUser === null || existingUser === void 0 ? void 0 : existingUser.email) === email) {
             return res.status(411).json({
                 success: false,
                 message: "User is alreay registered with us !"
@@ -42,7 +46,7 @@ const sendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         const send = yield prisma.otp.create({
             data: {
                 otp: otp,
-                userEmail: "ashishsrivat2@gmail.com"
+                userEmail: email
             }
         });
         (0, mailSender_1.mailSender)("OTP Send Successfully", email, `Hi , 
@@ -54,6 +58,7 @@ const sendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         res.status(200).json({
             success: true,
             message: "Otp sent successfully !",
+            otp
         });
     }
     catch (error) {
@@ -68,19 +73,104 @@ exports.sendOtp = sendOtp;
 const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         const body = req.body;
-        const { firstName, lastName, password, email, role, otp } = req.body;
+        const { firstName, lastName, password, email, isAdmin, otp } = req.body;
         const signup = validationSchema_1.signupSchema.safeParse(body);
-        console.log(signup);
         if (!signup.success) {
             return res.status(411).json({
                 success: false,
                 message: signup.error.issues.map(er => er.message)
             });
         }
-        if (!firstName || !lastName || !password || !email || otp) {
+        if (!firstName || !lastName || !password || !email || !otp) {
             return res.status(411).json({
                 success: false,
                 message: "Please fill all the details"
+            });
+        }
+        const getOpt = yield prisma.otp.findMany({
+            where: {
+                userEmail: email
+            }
+        });
+        console.log("------------------------");
+        const slicedOtp = getOpt.slice(-1)[0].otp;
+        console.log(slicedOtp, "sliced");
+        if (parseInt(slicedOtp) !== otp) {
+            return res.status(411).json({
+                success: false,
+                message: "Invalid Otp"
+            });
+        }
+        const hashedPassword = yield bcrypt_1.default.hash(password, 10);
+        const user = yield prisma.user.create({
+            data: {
+                email,
+                firstName,
+                lastName,
+                password: hashedPassword,
+                isAdmin,
+                profilePic: `https://api.dicebear.com/5.x/initials/svg?seed=${firstName} ${lastName}`
+            }
+        });
+        return res.status(200).json({
+            success: false,
+            message: "User created successfully !",
+            user
+        });
+    }
+    catch (error) {
+        console.log(error, "error");
+        return res.status(411).json({
+            success: false,
+            message: "Something went wrong !"
+        });
+    }
+});
+exports.signup = signup;
+const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    try {
+        const body = req.body;
+        const { email, password } = req.body;
+        console.log(typeof password, password, "value");
+        const login = validationSchema_1.loginSchema.safeParse(body);
+        if (!login.success) {
+            return res.status(411).json({
+                success: false,
+                message: login.error.issues.map(er => er.message)
+            });
+        }
+        if (!email || !password) {
+            return res.status(411).json({
+                success: false,
+                message: "Please fill all the details"
+            });
+        }
+        const user = yield prisma.user.findUnique({
+            where: {
+                email: email
+            }
+        });
+        console.log(user, "user");
+        const payload = {
+            fistName: user === null || user === void 0 ? void 0 : user.firstName,
+            lastName: user === null || user === void 0 ? void 0 : user.lastName,
+            email: user === null || user === void 0 ? void 0 : user.email,
+            profilePic: user === null || user === void 0 ? void 0 : user.profilePic,
+            createdAt: user === null || user === void 0 ? void 0 : user.createdAt
+        };
+        if (yield bcrypt_1.default.compare(password, String(user === null || user === void 0 ? void 0 : user.password))) {
+            const token = yield jsonwebtoken_1.default.sign(payload, "ECOMMERCEWEB");
+            res.status(200).json({
+                success: true,
+                message: "User logged in successfully !",
+                token,
+                user
+            });
+        }
+        else {
+            return res.status(411).json({
+                success: false,
+                message: "Invalid Password !"
             });
         }
     }
@@ -92,7 +182,7 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
         });
     }
 });
-exports.signup = signup;
+exports.signin = signin;
 // module.exports = {
 //     signup
 // }

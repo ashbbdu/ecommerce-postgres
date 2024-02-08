@@ -8,6 +8,7 @@ const Auth_1 = require("../controllers/Auth");
 const router = express_1.default.Router();
 router.post("/signup", Auth_1.signup);
 router.post("/sendotp", Auth_1.sendOtp);
+router.post("/signin", Auth_1.signin);
 router.get("/test", (req, res) => {
     res.send("<h1>test route</h1>");
 });
