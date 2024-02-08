@@ -71,6 +71,7 @@ const sendOtp = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
 });
 exports.sendOtp = sendOtp;
 const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
     try {
         const body = req.body;
         const { firstName, lastName, password, email, isAdmin, otp } = req.body;
@@ -92,8 +93,8 @@ const signup = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 userEmail: email
             }
         });
-        console.log("------------------------");
-        const slicedOtp = getOpt.slice(-1)[0].otp;
+        //Todo: make a check for existing user 
+        const slicedOtp = (_a = getOpt.slice(-1)[0]) === null || _a === void 0 ? void 0 : _a.otp;
         console.log(slicedOtp, "sliced");
         if (parseInt(slicedOtp) !== otp) {
             return res.status(411).json({
@@ -150,8 +151,14 @@ const signin = (req, res) => __awaiter(void 0, void 0, void 0, function* () {
                 email: email
             }
         });
-        console.log(user, "user");
+        if (!user) {
+            return res.status(411).json({
+                success: false,
+                message: "User does not exist !"
+            });
+        }
         const payload = {
+            id: user === null || user === void 0 ? void 0 : user.id,
             fistName: user === null || user === void 0 ? void 0 : user.firstName,
             lastName: user === null || user === void 0 ? void 0 : user.lastName,
             email: user === null || user === void 0 ? void 0 : user.email,

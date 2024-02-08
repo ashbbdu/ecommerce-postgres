@@ -89,6 +89,7 @@ export const signup = async (req: Request, res: Response) => {
                 message: signup.error.issues.map(er => er.message)
             })
         }
+
         if (!firstName || !lastName || !password || !email || !otp) {
             return res.status(411).json({
                 success: false,
@@ -100,9 +101,10 @@ export const signup = async (req: Request, res: Response) => {
                 userEmail: email
             }
         })
-        console.log("------------------------");
 
-        const slicedOtp = getOpt.slice(-1)[0].otp;
+        //Todo: make a check for existing user 
+
+        const slicedOtp = getOpt.slice(-1)[0]?.otp;
         console.log(slicedOtp , "sliced");
         
 
@@ -165,8 +167,15 @@ export const signin = async (req: Request, res: Response) => {
             }
         })
         
-        console.log(user , "user");
+        if(!user) {
+            return res.status(411).json({
+                success: false,
+                message: "User does not exist !"
+            })
+        }
+
         const payload = {
+            id : user?.id,
             fistName : user?.firstName,
             lastName : user?.lastName,
             email : user?.email,

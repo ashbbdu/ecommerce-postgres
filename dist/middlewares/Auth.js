@@ -21,14 +21,17 @@ const auth = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () 
     var _a, _b;
     try {
         let token = ((_a = req === null || req === void 0 ? void 0 : req.body) === null || _a === void 0 ? void 0 : _a.token) || ((_b = req === null || req === void 0 ? void 0 : req.header("Authorization")) === null || _b === void 0 ? void 0 : _b.replace("Bearer ", ""));
+        console.log(token, "token");
         if (!token) {
             return res.status(401).json({ success: false, message: "Token Missing" });
         }
         try {
-            const decode = yield jsonwebtoken_1.default.verify(token, "secret");
+            const decode = yield jsonwebtoken_1.default.verify(token, "ECOMMERCEWEB");
+            console.log(decode, "decode");
             req.body.user = decode;
         }
         catch (error) {
+            console.log(error, "err");
             return res
                 .status(401)
                 .json({ success: false, message: "Token is invalid" });
@@ -51,7 +54,7 @@ const isUser = (req, res, next) => __awaiter(void 0, void 0, void 0, function* (
                 email: req.body.user.email
             }
         });
-        if (!(userDetails === null || userDetails === void 0 ? void 0 : userDetails.isAdmin)) {
+        if (userDetails === null || userDetails === void 0 ? void 0 : userDetails.isAdmin) {
             return res.status(401).json({
                 success: false,
                 message: "This is a Protected Route for Users",
@@ -74,7 +77,7 @@ const isAdmin = (req, res, next) => __awaiter(void 0, void 0, void 0, function* 
                 email: req.body.user.email
             }
         });
-        if (userDetails === null || userDetails === void 0 ? void 0 : userDetails.isAdmin) {
+        if (!(userDetails === null || userDetails === void 0 ? void 0 : userDetails.isAdmin)) {
             return res.status(401).json({
                 success: false,
                 message: "This is a Protected Route for Admin",

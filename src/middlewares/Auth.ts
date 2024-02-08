@@ -1,6 +1,5 @@
 import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
-
 import jwt from "jsonwebtoken"
 require("dotenv").config()
 
@@ -10,16 +9,21 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
   try {
     let token =
       req?.body?.token || req?.header("Authorization")?.replace("Bearer ", "");
-
+    console.log(token , "token");
+    
 
     if (!token) {
       return res.status(401).json({ success: false, message: "Token Missing" });
     }
 
     try {
-      const decode = await jwt.verify(token, "secret");
+      const decode = await jwt.verify(token, "ECOMMERCEWEB");
+      console.log(decode , "decode");
+      
       req.body.user = decode;
     } catch (error) {
+      console.log(error , "err");
+      
       return res
         .status(401)
         .json({ success: false, message: "Token is invalid" });
@@ -44,7 +48,7 @@ export const isUser = async (req: Request, res: Response, next: NextFunction) =>
       }
     });
 
-    if (!userDetails?.isAdmin) {
+    if (userDetails?.isAdmin) {
       return res.status(401).json({
         success: false,
         message: "This is a Protected Route for Users",
@@ -68,7 +72,7 @@ export const isAdmin = async (req: Request, res: Response, next: NextFunction) =
     });
 
 
-    if (userDetails?.isAdmin) {
+    if (!userDetails?.isAdmin) {
       return res.status(401).json({
         success: false,
         message: "This is a Protected Route for Admin",
