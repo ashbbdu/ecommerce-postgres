@@ -1,8 +1,9 @@
 import { PrismaClient } from "@prisma/client";
 import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken"
-require("dotenv").config()
-
+// require("dotenv").config()
+import dotenv from "dotenv"
+dotenv.config()
 const prisma = new PrismaClient()
 
 export const auth = async (req: Request, res: Response, next: NextFunction) => {
@@ -17,7 +18,7 @@ export const auth = async (req: Request, res: Response, next: NextFunction) => {
     }
 
     try {
-      const decode = await jwt.verify(token, "ECOMMERCEWEB");
+      const decode = await jwt.verify(token, process.env.JWT_SECRET as string);
       console.log(decode , "decode");
       
       req.body.user = decode;
