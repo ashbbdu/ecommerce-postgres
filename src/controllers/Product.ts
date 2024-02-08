@@ -143,8 +143,11 @@ export const getAllProducts = async (req: Request, res: Response) => {
         const { title, description, category , page } = req.query;
         console.log(title, description, category);
 
-        const users = await prisma.product.findMany({
-            
+        const products = await prisma.product.findMany({
+            include : {
+                reviewAndRating : true
+                // avgRating can be taken out in frontend but lets make it a backend functionality
+            }, 
             where: {
                 OR : [
                     {
@@ -175,7 +178,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
         return res.status(200).json({
             success: true,
             message: "Users fetched successfully !",
-            users
+            products
         })
     } catch (error) {
         return res.status(401).json({
