@@ -29,7 +29,6 @@ model Otp {
   id          Int     @id @default(autoincrement())
   otp         String
   userEmail   String
- 
   // user        User    @relation(fields: [userEmail], references: [email])  / / aisa ek schema bna k chekc kro mappin jiski alg ho
   expireAfter Int     @default(60)
 }

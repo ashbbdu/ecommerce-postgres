@@ -3,7 +3,6 @@ import { createProduct, deleteProduct, getAllProducts, updateProduct } from "../
 import { auth, isAdmin, isUser } from "../middlewares/Auth";
 
 const router = experss.Router();
-
 router.post("/create-product" , auth , isAdmin , createProduct);
 router.put("/update-product" , auth , isAdmin , updateProduct)
 router.delete("/delete-product/:productId" , auth , isAdmin , deleteProduct)

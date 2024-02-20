@@ -84,7 +84,7 @@ export const updateProduct = async (req: Request, res: Response) => {
             },
             where: {
                 id: productId,
-                userId: id
+                userId: id   //error while updating with other user //handled using catch block try to handle the error with proper message insted of Something went wrong
             }
 
         })
@@ -168,7 +168,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
                 ],
             
             },
-            skip : Number(page) * 10,
+            skip : (Number(page) - 1) * 10,
             take : 10  
             // orderBy : {
             //      updatedAt : { sort: 'asc', nulls: 'last' }
