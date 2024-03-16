@@ -169,16 +169,18 @@ export const getAllProducts = async (req: Request, res: Response) => {
             
             },
             skip : (Number(page) - 1) * 10,
-            take : 10  
+            take : 10
             // orderBy : {
             //      updatedAt : { sort: 'asc', nulls: 'last' }
             // },
             
         });
+        const allProducts = await prisma.product.findMany({})
         return res.status(200).json({
             success: true,
             message: "Users fetched successfully !",
-            products
+            products,
+            totalRecords : allProducts.length
         })
     } catch (error) {
         return res.status(401).json({

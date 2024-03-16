@@ -42,7 +42,7 @@ model Product {
   category String
   userId Int
   user User @relation(fields: [userId], references: [id])
-  reviewAndRating ReviewAndRating[]
+  reviewAndRating ReviewAndRating[] 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
  // rating

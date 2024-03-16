@@ -3,7 +3,9 @@ import authRotues from "./rotues/authRotues"
 import productRoutes from "./rotues/productRoutes"
 import reviewAndRatingRoutes from "./rotues/ratingAndReviewRoutes"
 const app = express();
+const cors = require('cors')
 app.use(express.json())
+app.use(cors())
 require("dotenv").config()
 
 const PORT = process.env.PORT || 5000;

@@ -3,7 +3,7 @@ import { Request, Response } from "express";
 const prisma = new PrismaClient();
 export const addRating = async (req: Request, res: Response) => {
     try {
-        const { id } = req.body.user;
+        const { id } = req.body.user;     
         const { review , rating , productId } = req.body;
         if(!review || !rating) {
             return res.status(411).json({
@@ -33,6 +33,7 @@ export const addRating = async (req: Request, res: Response) => {
         })
     }
 }
+
 
 // export const getRatingofProduct = async (req: Request, res: Response) => {
 //     try {
