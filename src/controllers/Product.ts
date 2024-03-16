@@ -140,7 +140,7 @@ export const deleteProduct = async (req: Request, res: Response) => {
 // API's for users
 export const getAllProducts = async (req: Request, res: Response) => {
     try {
-        const { title, description, category , page } = req.query;
+        const { title, description, category , page , perPage } = req.query;
         console.log(title, description, category);
 
         const products = await prisma.product.findMany({
@@ -169,7 +169,7 @@ export const getAllProducts = async (req: Request, res: Response) => {
             
             },
             skip : (Number(page) - 1) * 10,
-            take : 10
+            take : Number(perPage)
             // orderBy : {
             //      updatedAt : { sort: 'asc', nulls: 'last' }
             // },
